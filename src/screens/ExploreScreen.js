@@ -10,7 +10,7 @@ import { getLocation } from '../services/location';
 
 const ExploreScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('price'); // 'price' | 'rating'
+  const [sort, setSort] = useState('price');
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState(null);
