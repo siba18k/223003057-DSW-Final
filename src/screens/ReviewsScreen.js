@@ -1,15 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
-
-const mockReviews = [
-  { id: '1', user: 'Alice', rating: 5, comment: 'Amazing stay!' },
-  { id: '2', user: 'Sipho', rating: 4, comment: 'Very comfortable and clean.' },
-];
+import { addReview, getReviewsForHotel } from '../services/firestore';
+import { auth } from '../config/firebase';
 
 const ReviewsScreen = ({ route, navigation }) => {
   const { hotel } = route.params || {};
-  const [reviews, setReviews] = useState(mockReviews);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    if (!hotel) return;
+    setLoading(true);
+    try {
+      const data = await getReviewsForHotel(hotel.id);
+      setReviews(data);
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, [hotel?.id]);
 
   return (
     <View style={{ flex: 1, padding: spacing.lg }}>
@@ -20,13 +35,14 @@ const ReviewsScreen = ({ route, navigation }) => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Text style={styles.user}>{item.user}</Text>
+            <Text style={styles.user}>{item.userId || 'User'}</Text>
             <Text style={styles.comment}>{item.comment}</Text>
           </View>
         )}
         ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
+        ListEmptyComponent={!loading ? <Text style={{ color: colors.textSecondary }}>No reviews yet.</Text> : null}
       />
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AddReview', { hotel })}>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AddReview', { hotel, onSubmitted: load })}>
         <Text style={styles.buttonText}>Add Review</Text>
       </TouchableOpacity>
     </View>

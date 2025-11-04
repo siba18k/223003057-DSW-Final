@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
+import { addBooking } from '../services/firestore';
+import { auth } from '../config/firebase';
 
 const BookingScreen = ({ route, navigation }) => {
   const { hotel } = route.params;
   const [name, setName] = useState('');
   const [nights, setNights] = useState('1');
 
-  const onConfirm = () => {
+  const onConfirm = async () => {
     if (!name || !nights) {
       return Alert.alert('Missing info', 'Please fill all fields');
     }
-    navigation.navigate('BookingConfirmation', { hotel, name, nights: Number(nights) });
+    try {
+      const userId = auth.currentUser?.uid || 'anonymous';
+      await addBooking({ hotelId: hotel.id, userId, name, nights: Number(nights), price: hotel.price });
+      navigation.navigate('BookingConfirmation', { hotel, name, nights: Number(nights) });
+    } catch (e) {
+      Alert.alert('Error', e.message);
+    }
   };
 
   return (

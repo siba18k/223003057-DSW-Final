@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
+import { addReview } from '../services/firestore';
+import { auth } from '../config/firebase';
 
 const AddReviewScreen = ({ route, navigation }) => {
-  const { hotel } = route.params || {};
+  const { hotel, onSubmitted } = route.params || {};
   const [rating, setRating] = useState('5');
   const [comment, setComment] = useState('');
 
-  const onSubmit = () => {
-    if (!comment) {
-      return Alert.alert('Validation', 'Please enter your comment');
+  const onSubmit = async () => {
+    try {
+      if (!comment) return Alert.alert('Validation', 'Please enter your comment');
+      const userId = auth.currentUser?.uid || 'anonymous';
+      await addReview({ hotelId: hotel.id, userId, rating: Number(rating), comment });
+      Alert.alert('Thank you', 'Your review has been submitted');
+      if (onSubmitted) onSubmitted();
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert('Error', e.message);
     }
-    Alert.alert('Thank you', 'Your review has been submitted');
-    navigation.goBack();
   };
 
   return (
