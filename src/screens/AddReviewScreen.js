@@ -3,32 +3,45 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
 import { addReview } from '../services/firestore';
 import { auth } from '../config/firebase';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const Star = ({ filled, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Icon name={filled ? 'star' : 'star-border'} size={28} color="#f5a623" />
+  </TouchableOpacity>
+);
 
 const AddReviewScreen = ({ route, navigation }) => {
   const { hotel, onSubmitted } = route.params || {};
-  const [rating, setRating] = useState('5');
+  const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
 
   const onSubmit = async () => {
     try {
       if (!comment) return Alert.alert('Validation', 'Please enter your comment');
-      const userId = auth.currentUser?.uid || 'anonymous';
-      await addReview({ hotelId: hotel.id, userId, rating: Number(rating), comment });
+      const userId = auth.currentUser?.uid;
+      if (!userId) { Alert.alert('Sign in required'); return navigation.navigate('SignIn'); }
+      await addReview({ hotelId: hotel.id, userId, rating, comment });
       Alert.alert('Thank you', 'Your review has been submitted');
       if (onSubmitted) onSubmitted();
       navigation.goBack();
-    } catch (e) {
-      Alert.alert('Error', e.message);
-    }
+    } catch (e) { Alert.alert('Error', e.message); }
   };
 
   return (
     <View style={{ flex: 1, padding: spacing.lg }}>
       <Text style={styles.title}>Add Review{hotel ? ` for ${hotel.name}` : ''}</Text>
-      <Text style={styles.label}>Rating (1-5)</Text>
-      <TextInput style={styles.input} value={rating} onChangeText={setRating} keyboardType="numeric" />
+
+      <Text style={styles.label}>Rating</Text>
+      <View style={{ flexDirection: 'row', gap: 4, marginBottom: spacing.md }}>
+        {[1,2,3,4,5].map(i => (
+          <Star key={i} filled={i <= rating} onPress={() => setRating(i)} />
+        ))}
+      </View>
+
       <Text style={styles.label}>Comment</Text>
       <TextInput style={[styles.input, { height: 100 }]} value={comment} onChangeText={setComment} multiline />
+
       <TouchableOpacity style={styles.button} onPress={onSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
