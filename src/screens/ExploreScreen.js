@@ -1,16 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, TextInput } from 'react-native';
 import { colors, typography, spacing, commonStyles, borderRadius } from '../constants/styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import axios from 'axios';
+import { getWeatherURL } from '../config/api';
 
 const ExploreScreen = ({ navigation }) => {
   const [search, setSearch] = React.useState('');
+  const [hotels, setHotels] = useState([]);
+  const [weather, setWeather] = useState(null);
 
-  const hotels = [
-    { id: '1', name: 'Oceanview Resort', location: 'Cape Town', price: 1299, rating: 4.6, image: 'https://picsum.photos/seed/hotel1/600/400' },
-    { id: '2', name: 'Safari Lodge', location: 'Kruger Park', price: 1899, rating: 4.8, image: 'https://picsum.photos/seed/hotel2/600/400' },
-    { id: '3', name: 'City Lights Hotel', location: 'Johannesburg', price: 999, rating: 4.2, image: 'https://picsum.photos/seed/hotel3/600/400' },
-  ];
+  useEffect(() => {
+    const loadHotels = async () => {
+      const snap = await getDocs(collection(db, 'hotels'));
+      const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setHotels(list);
+    };
+    loadHotels();
+
+    // Simple fixed coords for demo (Johannesburg). Replace with geolocation if needed
+    const loadWeather = async () => {
+      try {
+        const url = getWeatherURL(-26.2041, 28.0473);
+        const res = await axios.get(url);
+        setWeather(res.data);
+      } catch (e) {
+        // ignore weather errors in demo
+      }
+    };
+    loadWeather();
+  }, []);
+
+  const filtered = hotels.filter(h => `${h.name} ${h.location}`.toLowerCase().includes(search.toLowerCase()));
 
   const renderHotel = ({ item }) => (
     <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('HotelDetails', { hotel: item })}>
@@ -46,9 +69,18 @@ const ExploreScreen = ({ navigation }) => {
         />
         <Icon name="tune" size={24} color={colors.textSecondary} />
       </View>
+
+      {weather && (
+        <View style={styles.weatherCard}>
+          <Text style={styles.weatherCity}>Johannesburg</Text>
+          <Text style={styles.weatherTemp}>{Math.round(weather.main.temp)}°C</Text>
+          <Text style={styles.weatherDesc}>{weather.weather?.[0]?.description}</Text>
+        </View>
+      )}
+
       <FlatList
         contentContainerStyle={{ padding: spacing.lg }}
-        data={hotels}
+        data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={renderHotel}
         ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
@@ -69,9 +101,18 @@ const styles = StyleSheet.create({
     height: 48,
     gap: spacing.md,
   },
-  searchInput: {
-    flex: 1,
+  searchInput: { flex: 1 },
+  weatherCard: {
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
+  weatherCity: { ...typography.h3 },
+  weatherTemp: { ...typography.h2, color: colors.primary },
+  weatherDesc: { ...typography.body, color: colors.textSecondary },
   card: {
     backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
