@@ -1,104 +1,90 @@
-# Hotel Booking App - DSW02B1 Final Assessment
+# Hotel Booking App (Expo) — DSW02B1 Final Assessment
 
-## Overview
-A complete React Native hotel booking application built with modern best practices, including Firebase integration and third-party API consumption.
+This project runs on Expo Go. Follow the steps below to configure, run, and assess the app quickly.
 
-## Features
-- **Onboarding Flow**: Multi-screen introduction for new users
-- **Authentication**: Sign Up, Sign In, and Forgot Password
-- **Hotel Listings**: Browse and filter hotels
-- **Booking System**: Complete reservation flow
-- **Reviews**: User-generated hotel reviews
-- **Profile Management**: User account and booking history
-- **Firebase Integration**: Authentication and data storage
-- **Third-party APIs**: Weather and hotel data
-
-## Tech Stack
-- React Native
-- Firebase (Auth & Firestore)
-- React Navigation
-- AsyncStorage
-- Third-party APIs (OpenWeatherMap, Fake Store API)
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- React Native development environment
-- Firebase account
+## Prerequisites
+- Node.js ≥ 16
+- Expo CLI (npx works fine without global install)
+- Expo Go app on your device (Android/iOS)
+- Firebase project (Auth + Firestore enabled)
 - OpenWeatherMap API key
 
-### Installation
-
-1. Clone the repository:
+## Install & Run (Expo)
+1. Clone the repo
 ```bash
 git clone https://github.com/siba18k/223003057-DSW-Final.git
 cd 223003057-DSW-Final
 ```
 
-2. Install dependencies:
+2. Install dependencies
 ```bash
 npm install
-# or
-yarn install
+# Expo-managed native deps
+npx expo install expo-status-bar react-native-screens react-native-safe-area-context
+npx expo install @react-native-async-storage/async-storage @react-native-community/datetimepicker expo-location
+# JS deps
+npm install axios firebase @react-navigation/native @react-navigation/bottom-tabs @react-navigation/native-stack react-native-vector-icons
 ```
 
-3. Install iOS dependencies (iOS only):
+3. Configure Firebase
+- Open src/config/firebase.js and ensure the provided credentials are present (already added):
+  - apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId
+- Enable Email/Password in Firebase Auth
+- Create a Firestore database (in test mode for local assessment)
+
+4. Configure Weather API
+- Open src/config/api.js and set:
+```js
+export const WEATHER_API = {
+  baseURL: 'https://api.openweathermap.org/data/2.5',
+  apiKey: 'YOUR_OPENWEATHERMAP_API_KEY',
+};
+```
+
+5. Start the app in Expo Go
 ```bash
-cd ios && pod install
+npx expo start
 ```
+- Scan the QR code with the Expo Go app
 
-4. Firebase Setup:
-   - Create a new Firebase project
-   - Enable Email/Password authentication
-   - Create a Firestore database
-   - Add your configuration to `src/config/firebase.js`
-
-5. API Keys:
-   - Get OpenWeatherMap API key from https://openweathermap.org/api
-   - Add to `src/config/api.js`
-
-6. Run the app:
-```bash
-# For iOS
-npx react-native run-ios
-
-# For Android
-npx react-native run-android
-```
+## Optional: Seed demo data
+- Go to Profile → Admin Tools → Seed Hotels to populate Firestore with example hotels.
+- For submission, you may remove Admin Tools or guard it behind a development flag.
 
 ## Project Structure
 ```
+App.js
+index.js
+app.json
 src/
-├── components/          # Reusable UI components
-├── screens/            # Screen components
-├── navigation/         # Navigation configuration
-├── services/          # API calls and Firebase services
-├── config/           # Configuration files
-├── utils/           # Utility functions
-├── assets/         # Images and static assets
-└── constants/     # App constants and styles
+  config/        # firebase.js, api.js
+  constants/     # styles.js
+  navigation/    # MainTabNavigator.js
+  screens/       # Onboarding, Auth, Explore, Details, Booking, Reviews, Profile, Deals
+  services/      # firestore, users, location (expo), seed
+firestore.rules  # Suggested rules for testing
+ASSESSOR_GUIDE.md
+ExpoSetup.md
+SubmissionChecklist.md
 ```
 
-## Assignment Requirements Fulfilled
+## Key Features (Expo-ready)
+- Onboarding with images from Materials
+- Authentication (Sign Up/Sign In/Forgot Password) via Firebase Auth
+- Explore hotels from Firestore with search, sort (Price/Rating), loading/empty states
+- Geolocation-based weather card using expo-location and OpenWeatherMap
+- Booking flow with dates, rooms, total and auth guard; confirmation screen
+- Reviews with star rating selector, real-time preview on hotel details
+- Profile with display name edit and My Bookings joined with hotel names
+- Deals tab powered by Fake Store API (loading/error handling)
 
-### Section A: Mobile UI Implementation (60 marks)
-- ✅ A1. Onboarding Screens (5 marks)
-- ✅ A2. Authentication Screens (15 marks)
-- ✅ A3. Explore Page - Hotel Listings (15 marks)
-- ✅ A4. Booking Flow (15 marks)
-- ✅ A5. Reviews (5 marks)
-- ✅ A6. Profile Page (5 marks)
+## Firestore Rules (testing)
+See firestore.rules in the repo; copy into Firebase console → Firestore → Rules and publish.
 
-### Section B: Backend Integration (40 marks)
-- ✅ B1. Firebase Configuration (10 marks)
-- ✅ B2. Firebase Authentication Integration (10 marks)
-- ✅ B3. Data Storage in Firebase (10 marks)
-- ✅ B4. Third-Party API Integration (10 marks)
+## Troubleshooting
+- If icons don’t show, ensure react-native-vector-icons is installed (Expo supports it out of the box).
+- If weather fails, verify your OpenWeatherMap API key and device network.
+- If hotels list is empty, use Admin Tools → Seed Hotels, or add docs to hotels collection manually.
 
-## Student Information
-- **Name**: Sibahle Dube
-- **Student Number**: 223003057
-- **Module**: DSW02B1 - Development Software 2B
-- **Assessment Date**: November 4, 2025
+## Assessment Mapping
+See ASSESSOR_GUIDE.md for a direct mapping of question paper requirements to implementation and test steps.
