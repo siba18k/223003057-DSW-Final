@@ -3,24 +3,19 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Your Firebase configuration
-// Replace with your actual Firebase config
 const firebaseConfig = {
-  apiKey: "your-api-key-here",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
+  apiKey: "AIzaSyDlXJXfvl_HV_Az8akLxpaOu-y-Oze_isA",
+  authDomain: "adbeam.firebaseapp.com",
+  databaseURL: "https://adbeam-default-rtdb.firebaseio.com",
+  projectId: "adbeam",
+  storageBucket: "adbeam.firebasestorage.app",
+  messagingSenderId: "413534942519",
+  appId: "1:413534942519:web:90096d118754fc71a896b2"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
-
-// Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
 
 export default app;
