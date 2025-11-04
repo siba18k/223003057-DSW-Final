@@ -1,17 +1,12 @@
-// API Configuration for third-party services
-
-// OpenWeatherMap API configuration
 export const WEATHER_API = {
   baseURL: 'https://api.openweathermap.org/data/2.5',
-  apiKey: 'your-openweathermap-api-key-here', // Replace with your actual API key
+  apiKey: '57036209041bfaf8c8d1e00907885540',
 };
 
-// Fake Store API configuration (for hotel data simulation)
 export const FAKE_STORE_API = {
   baseURL: 'https://fakestoreapi.com',
 };
 
-// API endpoints
 export const ENDPOINTS = {
   weather: {
     current: '/weather',
@@ -23,7 +18,6 @@ export const ENDPOINTS = {
   },
 };
 
-// API helper functions
 export const getWeatherURL = (lat, lon) => 
   `${WEATHER_API.baseURL}${ENDPOINTS.weather.current}?lat=${lat}&lon=${lon}&appid=${WEATHER_API.apiKey}&units=metric`;
 
