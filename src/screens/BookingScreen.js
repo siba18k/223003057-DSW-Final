@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addBooking } from '../services/firestore';
@@ -25,15 +25,8 @@ const BookingScreen = ({ route, navigation }) => {
     }
     if (!name || !rooms) return Alert.alert('Missing info', 'Please fill all fields');
     if (checkOut <= checkIn) return Alert.alert('Invalid dates', 'Check-out must be after check-in');
-
     try {
-      await addBooking({
-        hotelId: hotel.id,
-        userId,
-        name,
-        nights,
-        price: hotel.price,
-      });
+      await addBooking({ hotelId: hotel.id, userId, name, nights, price: hotel.price });
       navigation.navigate('BookingConfirmation', { hotel, name, nights });
     } catch (e) { Alert.alert('Error', e.message); }
   };
@@ -41,13 +34,10 @@ const BookingScreen = ({ route, navigation }) => {
   return (
     <View style={{ flex: 1, padding: spacing.lg }}>
       <Text style={styles.title}>Book {hotel.name}</Text>
-
       <Text style={styles.label}>Your Name</Text>
       <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Enter full name" />
-
       <Text style={styles.label}>Rooms</Text>
       <TextInput style={styles.input} value={rooms} onChangeText={setRooms} keyboardType="numeric" />
-
       <Text style={styles.label}>Check-in</Text>
       <TouchableOpacity style={styles.input} onPress={() => setShowIn(true)}>
         <Text>{checkIn.toDateString()}</Text>
@@ -55,7 +45,6 @@ const BookingScreen = ({ route, navigation }) => {
       {showIn && (
         <DateTimePicker value={checkIn} mode="date" onChange={(_, d) => { setShowIn(false); if (d) setCheckIn(d); }} />
       )}
-
       <Text style={styles.label}>Check-out</Text>
       <TouchableOpacity style={styles.input} onPress={() => setShowOut(true)}>
         <Text>{checkOut.toDateString()}</Text>
@@ -63,10 +52,8 @@ const BookingScreen = ({ route, navigation }) => {
       {showOut && (
         <DateTimePicker value={checkOut} mode="date" onChange={(_, d) => { setShowOut(false); if (d) setCheckOut(d); }} />
       )}
-
       <View style={{ height: spacing.lg }} />
       <Text style={styles.total}>Total: R{total}</Text>
-
       <View style={{ height: spacing.xl }} />
       <TouchableOpacity style={styles.button} onPress={onConfirm}>
         <Text style={styles.buttonText}>Confirm Booking</Text>

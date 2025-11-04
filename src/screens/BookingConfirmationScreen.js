@@ -4,9 +4,7 @@ import { colors, typography, spacing } from '../constants/styles';
 
 const BookingConfirmationScreen = ({ route }) => {
   const { hotel, name, nights } = route.params;
-
   const total = hotel.price * nights;
-
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.lg }}>
       <Text style={styles.title}>Booking Confirmed!</Text>

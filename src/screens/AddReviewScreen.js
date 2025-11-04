@@ -31,17 +31,14 @@ const AddReviewScreen = ({ route, navigation }) => {
   return (
     <View style={{ flex: 1, padding: spacing.lg }}>
       <Text style={styles.title}>Add Review{hotel ? ` for ${hotel.name}` : ''}</Text>
-
       <Text style={styles.label}>Rating</Text>
       <View style={{ flexDirection: 'row', gap: 4, marginBottom: spacing.md }}>
         {[1,2,3,4,5].map(i => (
           <Star key={i} filled={i <= rating} onPress={() => setRating(i)} />
         ))}
       </View>
-
       <Text style={styles.label}>Comment</Text>
       <TextInput style={[styles.input, { height: 100 }]} value={comment} onChangeText={setComment} multiline />
-
       <TouchableOpacity style={styles.button} onPress={onSubmit}>
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
