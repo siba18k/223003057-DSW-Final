@@ -1,44 +1,68 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../constants/styles';
-import { signOut } from 'firebase/auth';
+import { signOut, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { seedHotels } from '../services/seed';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../config/firebase';
+import { updateUserDoc } from '../services/users';
 
 const ProfileScreen = ({ navigation }) => {
-  const onLogout = async () => {
-    await signOut(auth);
+  const [displayName, setDisplayName] = useState('');
+  const user = auth.currentUser;
+
+  const load = async () => {
+    if (!user?.uid) return;
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists()) {
+      const u = snap.data();
+      setDisplayName(u.displayName || '');
+    } else {
+      setDisplayName(user.displayName || '');
+    }
   };
 
-  const onSeed = async () => {
+  useEffect(() => { load(); }, [user?.uid]);
+
+  const onSave = async () => {
     try {
-      await seedHotels();
-      Alert.alert('Seed Complete', 'Sample hotels have been added.');
+      await updateProfile(user, { displayName });
+      await updateUserDoc(user.uid, { displayName });
+      Alert.alert('Saved', 'Profile updated');
     } catch (e) {
       Alert.alert('Error', e.message);
     }
   };
 
+  const onLogout = async () => { await signOut(auth); };
+
+  const onSeed = async () => {
+    try { await seedHotels(); Alert.alert('Seed Complete', 'Sample hotels added.'); } catch (e) { Alert.alert('Error', e.message); }
+  };
+
   return (
     <View style={{ flex: 1, padding: spacing.lg }}>
       <Text style={styles.title}>My Account</Text>
+      <Text style={{ ...typography.body, color: colors.textSecondary }}>Email: {user?.email}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MyBookings')}>
-        <Text style={styles.buttonText}>My Bookings</Text>
+      <Text style={styles.label}>Display Name</Text>
+      <TextInput style={styles.input} value={displayName} onChangeText={setDisplayName} placeholder="Your name" />
+      <TouchableOpacity style={styles.primary} onPress={onSave}><Text style={styles.primaryText}>Save</Text></TouchableOpacity>
+
+      <TouchableOpacity style={styles.primary} onPress={() => navigation.navigate('MyBookings')}>
+        <Text style={styles.primaryText}>My Bookings</Text>
       </TouchableOpacity>
 
       <View style={{ height: spacing.xl }} />
       <Text style={typography.h3}>Admin Tools</Text>
-      <Text style={{ ...typography.body, color: colors.textSecondary, marginBottom: spacing.md }}>
-        These tools are for local testing. Remove before submission.
-      </Text>
-
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.warning }]} onPress={onSeed}>
-        <Text style={styles.buttonText}>Seed Hotels</Text>
+      <Text style={{ ...typography.body, color: colors.textSecondary, marginBottom: spacing.md }}>For testing. Remove before submission.</Text>
+      <TouchableOpacity style={[styles.primary, { backgroundColor: colors.warning }]} onPress={onSeed}>
+        <Text style={styles.primaryText}>Seed Hotels</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.danger }]} onPress={onLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
+      <TouchableOpacity style={[styles.primary, { backgroundColor: colors.danger }]} onPress={onLogout}>
+        <Text style={styles.primaryText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );
@@ -46,8 +70,10 @@ const ProfileScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   title: { ...typography.h2, marginBottom: spacing.lg },
-  button: { backgroundColor: colors.primary, paddingVertical: spacing.md, borderRadius: borderRadius.md, alignItems: 'center', marginTop: spacing.md },
-  buttonText: { color: colors.background, fontWeight: '600' },
+  label: { ...typography.body, marginTop: spacing.lg, marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: colors.border, borderRadius: borderRadius.md, padding: spacing.md },
+  primary: { backgroundColor: colors.primary, paddingVertical: spacing.md, borderRadius: borderRadius.md, alignItems: 'center', marginTop: spacing.md },
+  primaryText: { color: colors.background, fontWeight: '600' },
 });
 
 export default ProfileScreen;
