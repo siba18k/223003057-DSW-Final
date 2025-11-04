@@ -5,15 +5,11 @@ import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/config/firebase';
-
-// Import screens
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import SignInScreen from './src/screens/SignInScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
-
-// Styles
 import { colors } from './src/constants/styles';
 
 const Stack = createStackNavigator();
@@ -24,23 +20,18 @@ const App = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    // Check onboarding status
     const checkOnboardingStatus = async () => {
       try {
         const hasCompletedOnboarding = await AsyncStorage.getItem('hasCompletedOnboarding');
         if (!hasCompletedOnboarding) {
           setShowOnboarding(true);
         }
-      } catch (error) {
-        console.log('Error checking onboarding status:', error);
-      }
+      } catch (error) {}
     };
 
-    // Listen to authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
       setUser(authenticatedUser);
       setIsLoading(false);
-      
       if (authenticatedUser && !showOnboarding) {
         checkOnboardingStatus();
       }
@@ -75,10 +66,8 @@ const App = () => {
             {(props) => <OnboardingScreen {...props} onComplete={handleOnboardingComplete} />}
           </Stack.Screen>
         ) : user ? (
-          // User is authenticated - show main app
           <Stack.Screen name="Main" component={MainTabNavigator} />
         ) : (
-          // User is not authenticated - show auth screens
           <>
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />

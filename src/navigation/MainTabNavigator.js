@@ -2,7 +2,6 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import ExploreScreen from '../screens/ExploreScreen';
 import HotelDetailsScreen from '../screens/HotelDetailsScreen';
 import BookingScreen from '../screens/BookingScreen';
@@ -12,7 +11,6 @@ import AddReviewScreen from '../screens/AddReviewScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MyBookingsScreen from '../screens/MyBookingsScreen';
 import DealsScreen from '../screens/DealsScreen';
-
 import { colors } from '../constants/styles';
 
 const Tab = createBottomTabNavigator();
