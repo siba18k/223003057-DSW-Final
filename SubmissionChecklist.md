@@ -1,0 +1,5 @@
+- Remove Admin Tools from Profile before final submission if required by rubric.
+- Seed hotels once, then comment out the button, or keep it behind a simple __DEV__ check.
+- Ensure WEATHER_API.apiKey is set for the assessor (or comment weather card if offline testing is required).
+- Use Expo Go: npx expo start
+- Firestore rules: copy from firestore.rules into Firebase console and publish.
