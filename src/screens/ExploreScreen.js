@@ -6,11 +6,13 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import axios from 'axios';
 import { getWeatherURL } from '../config/api';
+import { getLocation } from '../services/location';
 
 const ExploreScreen = ({ navigation }) => {
   const [search, setSearch] = React.useState('');
   const [hotels, setHotels] = useState([]);
   const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState('');
 
   useEffect(() => {
     const loadHotels = async () => {
@@ -20,16 +22,24 @@ const ExploreScreen = ({ navigation }) => {
     };
     loadHotels();
 
-    // Simple fixed coords for demo (Johannesburg). Replace with geolocation if needed
     const loadWeather = async () => {
+      let lat = -26.2041, lon = 28.0473, label = 'Johannesburg';
+      const coords = await getLocation();
+      if (coords) {
+        lat = coords.latitude;
+        lon = coords.longitude;
+        label = 'Your Area';
+      }
       try {
-        const url = getWeatherURL(-26.2041, 28.0473);
+        const url = getWeatherURL(lat, lon);
         const res = await axios.get(url);
         setWeather(res.data);
+        setCity(label);
       } catch (e) {
-        // ignore weather errors in demo
+        // ignore
       }
     };
+
     loadWeather();
   }, []);
 
@@ -72,7 +82,7 @@ const ExploreScreen = ({ navigation }) => {
 
       {weather && (
         <View style={styles.weatherCard}>
-          <Text style={styles.weatherCity}>Johannesburg</Text>
+          <Text style={styles.weatherCity}>{city || 'Your Area'}</Text>
           <Text style={styles.weatherTemp}>{Math.round(weather.main.temp)}°C</Text>
           <Text style={styles.weatherDesc}>{weather.weather?.[0]?.description}</Text>
         </View>
