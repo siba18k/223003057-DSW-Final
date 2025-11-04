@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Import screens
 import ExploreScreen from '../screens/ExploreScreen';
 import HotelDetailsScreen from '../screens/HotelDetailsScreen';
 import BookingScreen from '../screens/BookingScreen';
@@ -12,118 +11,47 @@ import ReviewsScreen from '../screens/ReviewsScreen';
 import AddReviewScreen from '../screens/AddReviewScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MyBookingsScreen from '../screens/MyBookingsScreen';
+import DealsScreen from '../screens/DealsScreen';
 
-// Import constants
 import { colors } from '../constants/styles';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Explore Stack Navigator
-const ExploreStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary,
-        },
-        headerTintColor: colors.background,
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Stack.Screen 
-        name="ExploreHome" 
-        component={ExploreScreen} 
-        options={{ title: 'Explore Hotels' }}
-      />
-      <Stack.Screen 
-        name="HotelDetails" 
-        component={HotelDetailsScreen} 
-        options={{ title: 'Hotel Details' }}
-      />
-      <Stack.Screen 
-        name="Booking" 
-        component={BookingScreen} 
-        options={{ title: 'Book Hotel' }}
-      />
-      <Stack.Screen 
-        name="BookingConfirmation" 
-        component={BookingConfirmationScreen} 
-        options={{ title: 'Booking Confirmed' }}
-      />
-      <Stack.Screen 
-        name="Reviews" 
-        component={ReviewsScreen} 
-        options={{ title: 'Reviews' }}
-      />
-      <Stack.Screen 
-        name="AddReview" 
-        component={AddReviewScreen} 
-        options={{ title: 'Add Review' }}
-      />
-    </Stack.Navigator>
-  );
-};
+const ExploreStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="ExploreHome" component={ExploreScreen} />
+    <Stack.Screen name="HotelDetails" component={HotelDetailsScreen} />
+    <Stack.Screen name="Booking" component={BookingScreen} />
+    <Stack.Screen name="BookingConfirmation" component={BookingConfirmationScreen} />
+    <Stack.Screen name="Reviews" component={ReviewsScreen} />
+    <Stack.Screen name="AddReview" component={AddReviewScreen} />
+  </Stack.Navigator>
+);
 
-// Profile Stack Navigator
-const ProfileStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary,
-        },
-        headerTintColor: colors.background,
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-    >
-      <Stack.Screen 
-        name="ProfileHome" 
-        component={ProfileScreen} 
-        options={{ title: 'Profile' }}
-      />
-      <Stack.Screen 
-        name="MyBookings" 
-        component={MyBookingsScreen} 
-        options={{ title: 'My Bookings' }}
-      />
-    </Stack.Navigator>
-  );
-};
+const ProfileStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="ProfileHome" component={ProfileScreen} />
+    <Stack.Screen name="MyBookings" component={MyBookingsScreen} />
+  </Stack.Navigator>
+);
 
-// Main Tab Navigator
-const MainTabNavigator = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'Explore') {
-            iconName = focused ? 'explore' : 'explore';
-          } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-
-          return <Icon name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-        },
-        headerShown: false,
-      })}
-    >
-      <Tab.Screen name="Explore" component={ExploreStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
-  );
-};
+const MainTabNavigator = () => (
+  <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ color, size }) => {
+        const icon = route.name === 'Explore' ? 'explore' : route.name === 'Deals' ? 'local-offer' : 'person';
+        return <Icon name={icon} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: colors.primary,
+      tabBarInactiveTintColor: colors.textSecondary,
+      headerShown: false,
+    })}
+  >
+    <Tab.Screen name="Explore" component={ExploreStack} />
+    <Tab.Screen name="Deals" component={DealsScreen} />
+    <Tab.Screen name="Profile" component={ProfileStack} />
+  </Tab.Navigator>
+);
 
 export default MainTabNavigator;
